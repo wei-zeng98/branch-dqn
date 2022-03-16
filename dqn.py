@@ -29,14 +29,14 @@ class ReplayBuffer(object):
     def get_len(self):
         return len(self.memory)
 
-def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, act_sub_dim=21, 
+def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, sub_act_dim=21, 
         criterion=torch.nn.MSELoss(), batch_size=64, freq_target_update=500, lr=1e-4):
     
     env = env_fn
 
     if isinstance(env.action_space, Discrete):
         act_type    = 'discrete'
-        act_sub_dim = [env.action_space.n]
+        sub_act_dim = [env.action_space.n]
         act_dim     = 1
         low         = [0]
         seg         = [1]
@@ -44,13 +44,13 @@ def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, act_sub_dim=2
     elif isinstance(env.action_space, Box):
         act_type    = 'box'
         act_dim  = env.action_space.shape[0]
-        if isinstance(act_sub_dim, int):
-            act_sub_dim = [act_sub_dim] * act_dim
+        if isinstance(sub_act_dim, int):
+            sub_act_dim = [sub_act_dim] * act_dim
         else:
-            assert len(act_sub_dim) == act_dim, "Action subdimension does not match!"
+            assert len(sub_act_dim) == act_dim, "Action subdimension does not match!"
         high        = env.action_space.high
         low         = env.action_space.low
-        seg         = (high - low) / (np.array(act_sub_dim) - 1)
+        seg         = (high - low) / (np.array(sub_act_dim) - 1)
     
     else:
         raise NotImplementedError('This type of action is not implemented.')
@@ -58,9 +58,9 @@ def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, act_sub_dim=2
     buffer     = ReplayBuffer(int(1e6))
     device     = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     policy_net = BranchDuelingDQN(env.observation_space, env.action_space, 
-                                  act_sub_dim, device, act_type).to(device)
+                                  sub_act_dim, device, act_type).to(device)
     target_net = BranchDuelingDQN(env.observation_space, env.action_space, 
-                                  act_sub_dim, device, act_type).to(device)
+                                  sub_act_dim, device, act_type).to(device)
     target_net.load_state_dict(policy_net.state_dict())
     target_net.eval()
     optimizer = torch.optim.Adam(policy_net.parameters(), lr)
@@ -85,7 +85,7 @@ def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, act_sub_dim=2
         reward   = Variable(torch.FloatTensor(np.array(data.reward))).to(device)    # (batch_size)
         done     = Variable(torch.IntTensor(np.array(data.done))).to(device)        # (batch_size)
         
-        q_policy_all = policy_net(obs)                                              # (batch_size, act_dim, act_sub_dim)
+        q_policy_all = policy_net(obs)                                              # (batch_size, act_dim, sub_act_dim)
         
         with torch.no_grad():
             next_q_policy_all = policy_net(next_obs)

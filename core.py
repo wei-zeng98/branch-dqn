@@ -14,10 +14,10 @@ def mlp(sizes, activation, output_activation=nn.Identity):
 class BranchDuelingDQN(nn.Module):
     """
     input: (batch_size, obs_dim)
-    output: (batch_size, act_dim, act_sub_dim)
+    output: (batch_size, act_dim, sub_act_dim)
     """
 
-    def __init__(self, observation_space, action_space, act_sub_dim, 
+    def __init__(self, observation_space, action_space, sub_act_dim, 
                  device, act_type, hidden_sizes=(64, 64), activation=nn.ReLU):
         super().__init__()
         self.device = device
@@ -33,12 +33,12 @@ class BranchDuelingDQN(nn.Module):
         self.adv_layer = []
 
         for i in range(act_dim):
-            adv = nn.Linear(hidden_sizes[-1], act_sub_dim[i]).to(device)
+            adv = nn.Linear(hidden_sizes[-1], sub_act_dim[i]).to(device)
             self.adv_layer.append(adv)
         
         self.steps_done = 0
         self.idx_l = np.zeros(act_dim)
-        self.idx_h = np.array(act_sub_dim)
+        self.idx_h = np.array(sub_act_dim)
     
     def forward(self, x):
         # calculate value and advantage for each action
@@ -54,7 +54,7 @@ class BranchDuelingDQN(nn.Module):
         for adv_i in adv_val:
             q = torch.cat((q, (value + adv_i - adv_i.mean()).unsqueeze(0)), 0)
 
-        # return size: (batch_size, act_dim, act_sub_dim)
+        # return size: (batch_size, act_dim, sub_act_dim)
         return q.permute(1, 0, 2)
     
     def act(self, obs, deterministic=False, es=0.9, ee=0.05, ed=1000):
