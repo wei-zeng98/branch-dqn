@@ -155,5 +155,5 @@ def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, sub_act_dim=2
 
 if __name__ == '__main__':
     import gym
-    env = gym.make('MountainCarContinuous-v0')
+    env = gym.make('CartPole-v1')
     dqn(env)

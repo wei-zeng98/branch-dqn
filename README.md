@@ -8,7 +8,7 @@ The branching architecture is summarized as following.
 
 ![Action Branching Architectures.](./img/Action-Branching-Architectures.png)
 
-For action of `Box` class, certain number of sub-actions need to be sampled from each continuous action dimension by setting parameter `act_sub_dim`, which could either be an integer or a list/tuple in the size of action dimension indication number of sub-actions for each action dimension. Given `act_sub_dim`, actions including lowest and highest possible value are equally sample from each action dimension as following.
+For action of `Box` class, certain number of sub-actions need to be sampled from each continuous action dimension by setting parameter `sub_act_dim`, which could either be an integer or a list/tuple in the size of action dimension indication number of sub-actions for each action dimension. Given `sub_act_dim`, actions including lowest and highest possible value are equally sample from each action dimension as following.
 
 ![Sub-action sampling.](./img/sub-actions.png)
 
