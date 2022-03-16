@@ -2,7 +2,7 @@ This is a PyTorch implementation of Dueling DQN with action branching architectu
 
 # Action Branching Architectures
 
-paper: https://arxiv.org/abs/1711.08946
+Reference paper: https://arxiv.org/abs/1711.08946
 
 The branching architecture is summarized as following.
 
