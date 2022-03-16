@@ -92,7 +92,7 @@ def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, sub_act_dim=2
             next_q_target_all = target_net(next_obs)
 
         # get predicted values from policy_net and action
-        q_policy = q_policy_all.gather(2, action.unsqueeze(2)).squeeze(2)           # (batch_size, act_dim)                                           
+        q_policy = q_policy_all.gather(2, action.unsqueeze(2)).squeeze(2)           # (batch_size, act_dim)
 
         # get the max value action index from policy_net
         a_idx = torch.max(next_q_policy_all, 2)[1].unsqueeze(2)                     # (batch_size, act_dim, 1)
@@ -100,8 +100,8 @@ def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, sub_act_dim=2
         # get target values from target_net and max value action
         next_q_target = (next_q_target_all.gather(2, a_idx).squeeze(2)).mean(1)     # (batch_size)
         expected_q_target = reward + gamma * next_q_target * (1 - done)             # (batch_size)
-        expected_q_target = expected_q_target.unsqueeze(1)                          # (batch_size, 1)                                 
-        expected_q_target = expected_q_target.repeat(1, act_dim)                    # (batch_size, act_dim)                 
+        expected_q_target = expected_q_target.unsqueeze(1)                          # (batch_size, 1)
+        expected_q_target = expected_q_target.repeat(1, act_dim)                    # (batch_size, act_dim)
         
         # return loss
         return criterion(q_policy, expected_q_target)
