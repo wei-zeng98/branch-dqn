@@ -42,15 +42,17 @@ def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, sub_act_dim=2
         seg         = [1]
     
     elif isinstance(env.action_space, Box):
-        act_type    = 'box'
+        act_type = 'box'
         act_dim  = env.action_space.shape[0]
+
         if isinstance(sub_act_dim, int):
             sub_act_dim = [sub_act_dim] * act_dim
         else:
             assert len(sub_act_dim) == act_dim, "Action subdimension does not match!"
-        high        = env.action_space.high
-        low         = env.action_space.low
-        seg         = (high - low) / (np.array(sub_act_dim) - 1)
+        
+        high = env.action_space.high
+        low  = env.action_space.low
+        seg  = (high - low) / (np.array(sub_act_dim) - 1)
     
     else:
         raise NotImplementedError('This type of action is not implemented.')
@@ -76,7 +78,7 @@ def dqn(env_fn, max_steps_per_epoch=35040, epochs=20, gamma=0.999, sub_act_dim=2
         target_net.load_state_dict(policy_net.state_dict())
     
     def compute_td_loss():
-        """Compute TD error, update in experience buffer and learn a step in policy_net"""
+        """Compute TD error"""
         
         data = buffer.sample(batch_size)
         obs      = Variable(torch.FloatTensor(np.array(data.obs))).to(device)       # (batch_size, obs_dim)
